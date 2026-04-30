@@ -65,36 +65,95 @@
       #transition .flower-img { filter: drop-shadow(0 0 1.8rem rgba(232, 112, 112, 0.55)); }
       #caveats    .flower-img { filter: drop-shadow(0 0 1.8rem rgba(192, 128, 232, 0.55)); }
 
-      /* Progress bar track */
+      /* ── Controls pill ── */
+      #controls {
+        position: fixed;
+        bottom: 1.1rem;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        background: rgba(10, 10, 10, 0.55);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 3rem;
+        padding: 0.45rem 0.9rem;
+        box-shadow: 0 6px 28px rgba(0, 0, 0, 0.45);
+        transition: opacity 0.4s, transform 0.4s;
+      }
+
+      .ctrl-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: rgba(255, 255, 255, 0.45);
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.2s, background 0.2s;
+        padding: 0;
+        flex-shrink: 0;
+      }
+      .ctrl-btn:hover:not(:disabled) {
+        color: rgba(255, 255, 255, 0.92);
+        background: rgba(255, 255, 255, 0.1);
+      }
+      .ctrl-btn:disabled {
+        opacity: 0.18;
+        cursor: default;
+      }
+
+      #ctrl-counter {
+        font-family: 'Fraunces', serif;
+        font-style: italic;
+        font-size: 0.68rem;
+        color: rgba(255, 255, 255, 0.3);
+        letter-spacing: 0.12em;
+        min-width: 2.4rem;
+        text-align: center;
+        user-select: none;
+      }
+
+      /* Divider between pause and arrows */
+      .ctrl-sep {
+        width: 1px;
+        height: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        flex-shrink: 0;
+      }
+
+      /* ── Progress bar ── */
       #progress-track {
         position: fixed;
         bottom: 0;
         left: 0;
         width: 100%;
-        height: 2px;
-        background: rgba(255, 255, 255, 0.07);
+        height: 3px;
+        background: rgba(255, 255, 255, 0.05);
         z-index: 9999;
       }
 
       #progress-fill {
         height: 100%;
-        width: 100%;
+        width: 0%;
         background: #e8ddd0;
+        box-shadow: 0 0 8px #e8ddd0;
+        border-radius: 0 2px 2px 0;
       }
 
-      /* Section counter (bottom-right) */
-      #section-counter {
-        position: fixed;
-        bottom: 1rem;
-        right: 1.2rem;
-        font-family: 'Fraunces', serif;
-        font-style: italic;
-        font-size: 0.7rem;
-        color: rgba(255, 255, 255, 0.2);
-        z-index: 9999;
-        letter-spacing: 0.12em;
-        pointer-events: none;
-        user-select: none;
+      /* Paused: bar pulses softly */
+      #progress-track.is-paused #progress-fill {
+        animation: bar-pulse 2s ease-in-out infinite;
+      }
+      @keyframes bar-pulse {
+        0%, 100% { opacity: 1; }
+        50%       { opacity: 0.3; }
       }
     </style>
   </head>
@@ -107,7 +166,7 @@
         <div class="content">
           <div class="message-wrapper">
             <img class="flower-img" src="https://assets.codepen.io/197359/flower-white.png" alt="flor blanca">
-            <p class="message-text">Espero no me llegues a terminar odiando por ser tan molesto tal vez y no cumplir cuando te dije, —si es lo último—; espero no hacerlo, pues quizás solo quieres seguir adelante, en un camino donde tú simplemente ya no me ves caminando a tu lado. Este será mi último intento, de querer conocerte, darte todo el amor que mereces... Querer quererte, pues mi corazón y yo te estamos eligiendo...</p>
+            <p class="message-text">Espero no me llegues a terminar odiando por ser tan molesto tal vez y no cumplir cuando te dije, si es lo último; espero no hacerlo, pues quizás solo quieres seguir adelante, en un camino donde tú simplemente ya no me ves caminando a tu lado. Este será mi último intento, de querer conocerte, darte todo el amor que mereces... Querer quererte, pues mi corazón y yo te estamos eligiendo...</p>
           </div>
         </div>
       </section>
@@ -154,61 +213,145 @@
 
     </main>
 
+    <!-- Bottom controls pill -->
+    <div id="controls">
+      <button class="ctrl-btn" id="ctrl-prev" title="Anterior" disabled>
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8.5,1.5 3.5,6.5 8.5,11.5"/></svg>
+      </button>
+      <div class="ctrl-sep"></div>
+      <button class="ctrl-btn" id="ctrl-pause" title="Pausar">
+        <svg id="icon-pause" width="13" height="13" viewBox="0 0 13 13" fill="currentColor"><rect x="2" y="1" width="3.5" height="11" rx="1"/><rect x="7.5" y="1" width="3.5" height="11" rx="1"/></svg>
+        <svg id="icon-play" width="13" height="13" viewBox="0 0 13 13" fill="currentColor" style="display:none"><polygon points="2,1 12,6.5 2,12"/></svg>
+      </button>
+      <span id="ctrl-counter">1 · 5</span>
+      <div class="ctrl-sep"></div>
+      <button class="ctrl-btn" id="ctrl-next" title="Siguiente">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4.5,1.5 9.5,6.5 4.5,11.5"/></svg>
+      </button>
+    </div>
+
     <!-- Progress bar -->
     <div id="progress-track">
       <div id="progress-fill"></div>
     </div>
 
-    <!-- Section counter -->
-    <div id="section-counter">1 · 5</div>
-
     <script src='https://flackr.github.io/scroll-timeline/dist/scroll-timeline.js'></script>
     <script>
       const sections = [
-        { id: 'snapping',   duration: 32000, color: '#e8ddd0' }, // ~75 palabras
-        { id: 'scrolling',  duration: 28000, color: '#f5c842' }, // ~65 palabras
-        { id: 'layout',     duration: 32000, color: '#7bbce0' }, // ~70 palabras
-        { id: 'transition', duration: 38000, color: '#e87070' }, // ~85 palabras
-        { id: 'caveats',    duration: 22000, color: '#c080e8' }, // ~45 palabras
+        { id: 'snapping',   duration: 32000, color: '#e8ddd0' },
+        { id: 'scrolling',  duration: 28000, color: '#f5c842' },
+        { id: 'layout',     duration: 32000, color: '#7bbce0' },
+        { id: 'transition', duration: 38000, color: '#e87070' },
+        { id: 'caveats',    duration: 22000, color: '#c080e8' },
       ];
 
-      let currentIndex = 0;
-      let advanceTimer = null;
+      let currentIndex   = 0;
+      let advanceTimer   = null;
+      let isPaused       = false;
+      let remaining      = 0;   // ms left when paused
+      let progressStart  = 0;   // timestamp when current run began
 
-      const fill    = document.getElementById('progress-fill');
-      const counter = document.getElementById('section-counter');
+      const fill       = document.getElementById('progress-fill');
+      const track      = document.getElementById('progress-track');
+      const counter    = document.getElementById('ctrl-counter');
+      const btnPrev    = document.getElementById('ctrl-prev');
+      const btnNext    = document.getElementById('ctrl-next');
+      const btnPause   = document.getElementById('ctrl-pause');
+      const iconPause  = document.getElementById('icon-pause');
+      const iconPlay   = document.getElementById('icon-play');
 
-      function goToSection(index) {
-        if (index >= sections.length) return;
+      /* ── UI state ── */
+      function syncUI() {
+        counter.textContent = `${currentIndex + 1} · ${sections.length}`;
+        btnPrev.disabled = currentIndex === 0;
+        btnNext.disabled = currentIndex === sections.length - 1;
+        iconPause.style.display = isPaused ? 'none'  : '';
+        iconPlay.style.display  = isPaused ? ''      : 'none';
+        btnPause.title = isPaused ? 'Reanudar' : 'Pausar';
+        track.classList.toggle('is-paused', isPaused);
+        // Tint bar color
+        const color = sections[currentIndex].color;
+        fill.style.background  = color;
+        fill.style.boxShadow   = `0 0 10px ${color}99`;
+      }
 
-        const { id, duration, color } = sections[index];
-
-        document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
-
-        // Update counter label and bar color
-        counter.textContent = `${index + 1} · ${sections.length}`;
-        fill.style.background = color;
-
-        // Reset bar, then animate it depleting over `duration` ms
+      /* ── Progress bar animation ── */
+      function runBar(durationMs, fromPct = 100) {
         fill.style.transition = 'none';
-        fill.style.width = '100%';
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            fill.style.transition = `width ${duration}ms linear`;
-            fill.style.width = '0%';
-          });
-        });
+        fill.style.width = fromPct + '%';
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          fill.style.transition = `width ${durationMs}ms linear`;
+          fill.style.width = '0%';
+        }));
+      }
 
-        // Auto-advance to next section
+      function freezeBar() {
+        // Capture current rendered width and freeze
+        const pct = fill.getBoundingClientRect().width /
+                    track.getBoundingClientRect().width * 100;
+        fill.style.transition = 'none';
+        fill.style.width = pct + '%';
+        remaining = (pct / 100) * sections[currentIndex].duration;
+      }
+
+      /* ── Navigation ── */
+      function goToSection(index, resetPause = true) {
+        if (index < 0 || index >= sections.length) return;
+        currentIndex = index;
+
+        if (resetPause) isPaused = false;
+
         clearTimeout(advanceTimer);
-        if (index < sections.length - 1) {
+        document.getElementById(sections[index].id)
+          .scrollIntoView({ behavior: 'smooth' });
+
+        syncUI();
+
+        const dur = sections[index].duration;
+        remaining = dur;
+        runBar(dur);
+        progressStart = Date.now();
+
+        if (!isPaused && index < sections.length - 1) {
           advanceTimer = setTimeout(() => {
             currentIndex++;
             goToSection(currentIndex);
-          }, duration);
+          }, dur);
         }
       }
 
+      /* ── Pause / Resume ── */
+      btnPause.addEventListener('click', () => {
+        if (!isPaused) {
+          // PAUSE
+          isPaused = true;
+          clearTimeout(advanceTimer);
+          freezeBar();
+        } else {
+          // RESUME
+          isPaused = false;
+          runBar(remaining, remaining / sections[currentIndex].duration * 100);
+          progressStart = Date.now();
+          if (currentIndex < sections.length - 1) {
+            advanceTimer = setTimeout(() => {
+              currentIndex++;
+              goToSection(currentIndex);
+            }, remaining);
+          }
+        }
+        syncUI();
+      });
+
+      /* ── Manual navigation ── */
+      btnPrev.addEventListener('click', () => {
+        if (currentIndex > 0) goToSection(currentIndex - 1);
+      });
+
+      btnNext.addEventListener('click', () => {
+        if (currentIndex < sections.length - 1) goToSection(currentIndex + 1);
+      });
+
+      /* ── Boot ── */
       window.addEventListener('load', () => {
         window.scrollTo({ top: 0, behavior: 'instant' });
         setTimeout(() => goToSection(0), 800);
